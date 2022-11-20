@@ -4,22 +4,30 @@ using UnityEngine;
 public class StaticMeshCollider : MonoBehaviour
 {
     Triangle[] triangles;
+    public Bounds bounds;
 
     void Start()
     {
         PhysicsManager.instance.RegisterStaticMeshCollider(this);
 
         var mesh = GetComponent<MeshFilter>().mesh;
-        int triCount = mesh.triangles.Length / 3;
-        triangles = new Triangle[triCount];
-
-        for (int i = 0; i < triCount; i++)
+        if (mesh != null)
         {
-            triangles[i] = new Triangle(
-                transform.TransformPoint(mesh.vertices[mesh.triangles[i * 3 + 0]]),
-                transform.TransformPoint(mesh.vertices[mesh.triangles[i * 3 + 1]]),
-                transform.TransformPoint(mesh.vertices[mesh.triangles[i * 3 + 2]]));
+            int triCount = mesh.triangles.Length / 3;
+            triangles = new Triangle[triCount];
+
+            for (int i = 0; i < triCount; i++)
+            {
+                triangles[i] = new Triangle(
+                    transform.TransformPoint(mesh.vertices[mesh.triangles[i * 3 + 0]]),
+                    transform.TransformPoint(mesh.vertices[mesh.triangles[i * 3 + 1]]),
+                    transform.TransformPoint(mesh.vertices[mesh.triangles[i * 3 + 2]]));
+            }
         }
+
+        var renderer = GetComponent<Renderer>();
+        if (renderer)
+            bounds = renderer.bounds;
     }
 
     public bool SphereCollision(Vector3 sphereCenter, float sphereRadius, Vector3 vel, out float timeTillColl, out Vector3 collNormal) 

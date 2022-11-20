@@ -7,6 +7,7 @@ public struct BodyState
     public Vector3 pos;
     public Vector3 vel;
     public Vector3 angVel;
+    public float speed;
     public float radius;
     public float mass;
 }
@@ -19,6 +20,8 @@ public class PhysicsManager : MonoBehaviour
 
     public float gravity = 9.81f;
     public float airDensity = 1.225f;
+    public float rotationalDamping = 1f;
+    public float magnusLift = 0.4f;
 
     List<PhysicsBody> bodies = new List<PhysicsBody>();
     List<StaticMeshCollider> colliders = new List<StaticMeshCollider>();
@@ -50,12 +53,16 @@ public class PhysicsManager : MonoBehaviour
             bodyStates[i].angVel = bodies[i].angularVelocity;
             bodyStates[i].radius = bodies[i].radius;
             bodyStates[i].mass   = bodies[i].mass;
+            bodyStates[i].speed  = bodies[i].velocity.magnitude;
         }
 
         // update all bodies
         //System.Threading.Tasks.Parallel.For(0, bodies.Count - 1, i =>
         for (int i = 0; i < bodies.Count; i++)
         {
+            if (!bodies[i].gameObject.activeSelf)
+                continue;
+
             var stateMe = bodyStates[i];
             float minCollTime = float.MaxValue;
             int collider = -1;
@@ -64,7 +71,13 @@ public class PhysicsManager : MonoBehaviour
             // brute-force collision check against all colliders in the scene
             for (int j = 0; j < colliders.Count; j++)
             {
-                if(colliders[j].SphereCollision(stateMe.pos, stateMe.radius, stateMe.vel, out float timeTillColl, out Vector3 normal))
+                // early out if we are well outside the bounding volume
+                float maxMoveRadius = stateMe.radius + stateMe.speed * dt;
+                if (colliders[j].bounds != null &&
+                    colliders[j].bounds.SqrDistance(stateMe.pos) > maxMoveRadius * maxMoveRadius + 0.01f)
+                    continue;
+                
+                if (colliders[j].SphereCollision(stateMe.pos, stateMe.radius, stateMe.vel, out float timeTillColl, out Vector3 normal))
                 {
                     if (timeTillColl >= 0 &&
                         timeTillColl <= dt &&
@@ -80,6 +93,9 @@ public class PhysicsManager : MonoBehaviour
             // brute-force collision check against all other bodies in the scene
             for (int j = 0; j < bodies.Count; j++)
             {
+                if (!bodies[i].gameObject.activeSelf)
+                    continue;
+
                 var stateCollider = bodyStates[j];
                 if (SphereVsSphere.TestCollision(stateMe.pos, stateMe.vel, stateMe.radius, stateCollider.pos, stateCollider.vel, stateCollider.radius, out float timeTillColl))
                 {
@@ -106,20 +122,13 @@ public class PhysicsManager : MonoBehaviour
             }
             else
             {
-                // no collision => move body forward normally
-                bodies[i].position += stateMe.vel * dt;
+                // no collision => move body normally
+                bodies[i].UpdateMotion(this, dt);
             }
 
-            // air drag
-            float speedSqr = stateMe.vel.sqrMagnitude;
-            float area = stateMe.radius * stateMe.radius * Mathf.PI;
-            float dragCoefficient = 0.47f; // drag coeff for sphere
-            float dragAccel = 0.5f * dragCoefficient * airDensity * speedSqr * area / stateMe.mass;
-
-            bodies[i].velocity -= stateMe.vel.normalized * dragAccel * dt;
-
-            // gravity
-            bodies[i].velocity.y -= gravity * dt;
+            // disable bodies when out of bounds
+            if (bodies[i].position.sqrMagnitude > 10000)
+                bodies[i].gameObject.SetActive(false);
         }
         //);
     }

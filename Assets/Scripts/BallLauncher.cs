@@ -9,9 +9,12 @@ public class BallLauncher : MonoBehaviour
     public Vector3 offsetPosition;
     public Vector3 offsetRotation;
 
-    public float rotSpeed = 1;
-    public float fireRate = 10;
-    public float ballSpeed = 20;
+    [Range(1, 100)]    public float fireRate = 10;
+    [Range(0.01f, 1)]  public float ballRadius = 0.3f;
+    [Range(0.5f, 100)] public float ballDensity = 20;
+    [Range(5, 100)]    public float ballSpeed = 20;
+    [Range(-100, 100)] public float topSpin;
+    [Range(-100, 100)] public float sideSpin;
 
     float autoFireTimer;
 
@@ -38,8 +41,12 @@ public class BallLauncher : MonoBehaviour
         {
             var ball = Instantiate(ballPrefab, transform);
             ball.transform.parent = transform.parent;
+            ball.transform.localScale = new Vector3(ballRadius, ballRadius, ballRadius) * 2;
             var body = ball.GetComponent<PhysicsBody>();
             body.velocity = -transform.up * ballSpeed;
+            body.angularVelocity = new Vector3(topSpin, sideSpin, 0) * Mathf.Deg2Rad * 360; // spin is in rotations per second
+            body.radius = ballRadius;
+            body.mass = body.volume * ballDensity;
         }
 
         // position and rotate the launcher relative to the parent object 
