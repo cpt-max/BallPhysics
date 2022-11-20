@@ -55,7 +55,7 @@ public class PhysicsBody : MonoBehaviour
         float inertiaMoment = mass * radius * radius * (2f / 3f); // hollow sphere
         float rotDragAccel = rotDragMoment / inertiaMoment;
         angularVelocity -= angularVelocity.normalized * rotDragAccel * dt;
-
+        
         //============================================================================
         // magnus effect (lift force from spinning): https://www.engineersedge.com/calculators/magnus_effect_calculator_15766.htm
         //============================================================================

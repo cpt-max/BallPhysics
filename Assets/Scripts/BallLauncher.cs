@@ -44,7 +44,7 @@ public class BallLauncher : MonoBehaviour
             ball.transform.localScale = new Vector3(ballRadius, ballRadius, ballRadius) * 2;
             var body = ball.GetComponent<PhysicsBody>();
             body.velocity = -transform.up * ballSpeed;
-            body.angularVelocity = new Vector3(topSpin, sideSpin, 0) * Mathf.Deg2Rad * 360; // spin is in rotations per second
+            body.angularVelocity = new Vector3(topSpin, 0, sideSpin) * Mathf.Deg2Rad * 360; // spin is in rotations per second
             body.radius = ballRadius;
             body.mass = body.volume * ballDensity;
         }
@@ -53,8 +53,11 @@ public class BallLauncher : MonoBehaviour
         if (parent != null)
         {
             Matrix4x4 parentMat = parent.transform.localToWorldMatrix;
+            float caliber = Mathf.Sqrt(ballRadius) * 2.5f;
+
             transform.position = parentMat.MultiplyPoint(offsetPosition);
             transform.rotation = parent.transform.rotation * Quaternion.Euler(offsetRotation);
+            transform.localScale = new Vector3(caliber, transform.localScale.y, caliber);
         }
     }
 }

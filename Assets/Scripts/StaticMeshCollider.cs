@@ -10,6 +10,7 @@ public class StaticMeshCollider : MonoBehaviour
     {
         PhysicsManager.instance.RegisterStaticMeshCollider(this);
 
+        // get all triangles from the mesh in world space
         var mesh = GetComponent<MeshFilter>().mesh;
         if (mesh != null)
         {
@@ -25,6 +26,7 @@ public class StaticMeshCollider : MonoBehaviour
             }
         }
 
+        // get bounding volume for optimized collision checks
         var renderer = GetComponent<Renderer>();
         if (renderer)
             bounds = renderer.bounds;
