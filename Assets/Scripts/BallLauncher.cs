@@ -10,8 +10,8 @@ public class BallLauncher : MonoBehaviour
     public Vector3 offsetRotation;
 
     [Range(1, 100)]    public float fireRate = 10;
-    [Range(0.01f, 1)]  public float ballRadius = 0.3f;
-    [Range(0.5f, 100)] public float ballDensity = 20;
+    [Range(0.02f, 1)]  public float ballRadius = 0.3f;
+    [Range(1, 100)]    public float ballDensity = 20;
     [Range(5, 100)]    public float ballSpeed = 20;
     [Range(-100, 100)] public float topSpin;
     [Range(-100, 100)] public float sideSpin;
