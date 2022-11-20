@@ -5,8 +5,13 @@ public class BallLauncher : MonoBehaviour
 {
     public GameObject ballPrefab;
 
+    public GameObject parent;
+    public Vector3 offsetPosition;
+    public Vector3 offsetRotation;
+
     public float rotSpeed = 1;
     public float fireRate = 10;
+    public float ballSpeed = 20;
 
     float autoFireTimer;
 
@@ -29,21 +34,20 @@ public class BallLauncher : MonoBehaviour
         }
 
         // fire!!!
-        if (fire)
+        if (fire && ballPrefab != null)
         {
             var ball = Instantiate(ballPrefab, transform);
             ball.transform.parent = transform.parent;
             var body = ball.GetComponent<PhysicsBody>();
-            body.velocity = -transform.up * 10;
+            body.velocity = -transform.up * ballSpeed;
         }
 
-        // aim the launcher
-        Vector3 rot = new Vector3(
-            -Input.GetAxis("Vertical") * 0.2f - Input.GetAxis("Mouse Y"),
-            0,
-            Input.GetAxis("Horizontal") * 0.2f + Input.GetAxis("Mouse X")
-            );
-
-        transform.Rotate(rot * rotSpeed);
+        // position and rotate the launcher relative to the parent object 
+        if (parent != null)
+        {
+            Matrix4x4 parentMat = parent.transform.localToWorldMatrix;
+            transform.position = parentMat.MultiplyPoint(offsetPosition);
+            transform.rotation = parent.transform.rotation * Quaternion.Euler(offsetRotation);
+        }
     }
 }
