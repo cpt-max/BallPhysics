@@ -3,9 +3,11 @@ using UnityEngine;
 
 public static class SphereVsSphere
 {
-    public static bool TestCollision(Vector3 pos1, Vector3 vel1, float rad1, Vector3 pos2, Vector3 vel2, float rad2, out float timeTillColl)
+    public static bool TestCollision(Vector3 pos1, Vector3 vel1, float rad1, Vector3 pos2, Vector3 vel2, float rad2, out float timeTillColl, out Vector3 contactPoint, out Vector3 contactNormal)
     {
         timeTillColl = 0;
+        contactNormal = Vector3.zero;
+        contactPoint = Vector3.zero;
 
         Vector3 deltaPos = pos2 - pos1;
         Vector3 deltaVel = vel2 - vel1;
@@ -17,6 +19,10 @@ public static class SphereVsSphere
         if (QuadraticEquation(a, b, c, out float t1, out float t2))
         {
             timeTillColl = Mathf.Min(t1, t2);
+            Vector3 collPos1 = pos1 + vel1 * timeTillColl;
+            Vector3 collPos2 = pos2 + vel2 * timeTillColl;
+            contactNormal = Vector3.Normalize(collPos1 - collPos2);
+            contactPoint = collPos1 - contactNormal * rad1;
             return true;
         }
 

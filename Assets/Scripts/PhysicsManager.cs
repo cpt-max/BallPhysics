@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct BodyState
+public struct BallState
 {
     public Vector3 pos;
     public Vector3 vel;
@@ -16,17 +16,17 @@ public class PhysicsManager : MonoBehaviour
 {
     public static PhysicsManager instance;
 
-    public int bodyCount;
+    public int ballCount;
+    public int maxBallCount = 100;
+    public GameObject ballsParent;
 
     public float gravity = 9.81f;
     public float airDensity = 1.225f;
-    public float rotationalDamping = 1f;
-    public float magnusLift = 0.4f;
 
-    List<PhysicsBody> bodies = new List<PhysicsBody>();
+    List<Ball> balls = new List<Ball>();
     List<StaticMeshCollider> colliders = new List<StaticMeshCollider>();
 
-    BodyState[] bodyStates = new BodyState[1000];
+    BallState[] ballStates = new BallState[1000];
 
     void Awake()
     {
@@ -37,105 +37,118 @@ public class PhysicsManager : MonoBehaviour
             instance = this;
     }
 
+    private void Start()
+    {
+        ballsParent = new GameObject("Balls");
+        ballsParent.transform.parent = gameObject.transform;
+    }
+
     void FixedUpdate()
     {
         float dt = Time.deltaTime;
-        bodyCount = bodies.Count;
+        ballCount = balls.Count;
 
-        // copy body parameters to readonly bodyStates array
-        if (bodyStates.Length < bodies.Count)
-            bodyStates = new BodyState[bodies.Count * 2];
+        // copy ball parameters to readonly bodyStates array
+        // this will make sure that reults are independent of the body update order
+        if (ballStates.Length < balls.Count)
+            ballStates = new BallState[balls.Count * 2];
 
-        for (int i = 0; i < bodies.Count; i++)
+        for (int i = 0; i < balls.Count; i++)
         {
-            bodyStates[i].pos    = bodies[i].position;
-            bodyStates[i].vel    = bodies[i].velocity;
-            bodyStates[i].angVel = bodies[i].angularVelocity;
-            bodyStates[i].radius = bodies[i].radius;
-            bodyStates[i].mass   = bodies[i].mass;
-            bodyStates[i].speed  = bodies[i].velocity.magnitude;
+            ballStates[i].pos    = balls[i].position;
+            ballStates[i].vel    = balls[i].velocity;
+            ballStates[i].angVel = balls[i].angularVelocity;
+            ballStates[i].radius = balls[i].radius;
+            ballStates[i].mass   = balls[i].mass;
+            ballStates[i].speed  = balls[i].velocity.magnitude;
         }
 
         // update all bodies
-        //System.Threading.Tasks.Parallel.For(0, bodies.Count - 1, i =>
-        for (int i = 0; i < bodies.Count; i++)
+        for (int i = 0; i < balls.Count; i++)
         {
-            if (!bodies[i].gameObject.activeSelf)
+            if (!balls[i].gameObject.activeSelf)
                 continue;
 
-            var stateMe = bodyStates[i];
-            float minCollTime = float.MaxValue;
+            var stateMe = ballStates[i];
+            float timeTillColl = float.MaxValue;
             int collider = -1;
-            Vector3 surfaceNormal = Vector3.zero;
+            bool colliderIsBall = false;
+            Vector3 contactNormal = Vector3.zero;
+            Vector3 contactPoint = Vector3.zero;
 
-            // brute-force collision check against all colliders in the scene
+            // brute-force collision check against all static collision objects in the scene
             for (int j = 0; j < colliders.Count; j++)
             {
-                // early out if we are well outside the bounding volume
-                float maxMoveRadius = stateMe.radius + stateMe.speed * dt;
-                if (colliders[j].bounds != null &&
-                    colliders[j].bounds.SqrDistance(stateMe.pos) > maxMoveRadius * maxMoveRadius + 0.01f)
-                    continue;
-                
-                if (colliders[j].SphereCollision(stateMe.pos, stateMe.radius, stateMe.vel, out float timeTillColl, out Vector3 normal))
+                if (colliders[j].SphereCollision(stateMe.pos, stateMe.radius, stateMe.vel, stateMe.speed * dt, out float collTime, out Vector3 point, out Vector3 normal))
                 {
-                    if (timeTillColl >= 0 &&
-                        timeTillColl <= dt &&
-                        timeTillColl < minCollTime)
+                    if (collTime <= dt &&
+                        collTime >= 0 &&
+                        collTime < timeTillColl)
                     {
-                        minCollTime = timeTillColl;
+                        timeTillColl = collTime;
                         collider = j;
-                        surfaceNormal = normal;
+                        colliderIsBall = false;
+                        contactPoint = point;
+                        contactNormal = normal;
                     }
                 }
             }
 
             // brute-force collision check against all other bodies in the scene
-            for (int j = 0; j < bodies.Count; j++)
+            for (int j = 0; j < balls.Count; j++)
             {
-                if (!bodies[i].gameObject.activeSelf)
+                if (balls[i] == null || !balls[i].gameObject.activeSelf)
                     continue;
 
-                var stateCollider = bodyStates[j];
-                if (SphereVsSphere.TestCollision(stateMe.pos, stateMe.vel, stateMe.radius, stateCollider.pos, stateCollider.vel, stateCollider.radius, out float timeTillColl))
+                var stateCollider = ballStates[j];
+                if (SphereVsSphere.TestCollision(stateMe.pos, stateMe.vel, stateMe.radius, stateCollider.pos, stateCollider.vel, stateCollider.radius, out float collTime, out Vector3 point, out Vector3 normal))
                 {
-                    if (timeTillColl >= 0 &&
-                        timeTillColl <= dt &&
-                        timeTillColl < minCollTime)
+                    if (collTime <= dt &&
+                        collTime >= 0 &&
+                        collTime < timeTillColl)
                     {
-                        minCollTime = timeTillColl;
+                        timeTillColl = collTime;
                         collider = j;
-                        Vector3 collPos = stateMe.pos + stateMe.vel * minCollTime;
-                        surfaceNormal = Vector3.Normalize(collPos - stateCollider.pos);
+                        colliderIsBall = true;
+                        contactPoint = point;
+                        contactNormal = normal;
                     }
                 }
             }
 
+            // collision response
             if (collider >= 0)
             {
-                // collision happend => reflect the ball off the surface of the other ball
-                Vector3 collPos = stateMe.pos + stateMe.vel * minCollTime;
-                Vector3 newVel = Vector3.Reflect(stateMe.vel, surfaceNormal);
-
-                bodies[i].position = collPos;
-                bodies[i].velocity = newVel;
+                // collision happend 
+                if (colliderIsBall)
+                    balls[i].BounceOffOtherBall(ballStates[collider], contactPoint, contactNormal, timeTillColl);
+                else
+                    balls[i].BounceOffStaticSurface(contactPoint, contactNormal, timeTillColl);     
             }
             else
             {
                 // no collision => move body normally
-                bodies[i].UpdateMotion(this, dt);
+                balls[i].UpdateMotion(this, dt);
             }
-
-            // disable bodies when out of bounds
-            if (bodies[i].position.sqrMagnitude > 10000)
-                bodies[i].gameObject.SetActive(false);
         }
-        //);
+
+        // remove bodies when out of bounds or too many
+        for (int i = 0; i < balls.Count; i++)
+        {
+            if (balls.Count > maxBallCount || 
+                balls[i].position.sqrMagnitude > 10000)
+            {
+                Destroy(balls[i].gameObject);
+                balls.RemoveAt(i);
+                i--;
+            }
+        }
     }
 
-    public void RegisterBody(PhysicsBody body)
+
+    public void RegisterBall(Ball ball)
     {
-        bodies.Add(body);
+        balls.Add(ball);
     }
 
     

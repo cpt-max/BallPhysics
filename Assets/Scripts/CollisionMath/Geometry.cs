@@ -1,13 +1,6 @@
 ﻿using System;
 using UnityEngine;
 
-public struct Sphere
-{
-	public Vector3 center;
-	public float radius;
-}
-
-
 public struct Triangle
 {
 	public Vector3 p1;
@@ -61,7 +54,6 @@ public struct Plane
 	public static Plane FromPointAndNormal(Vector3 p, Vector3 n)
 	{
 		Vector3 nn = n.normalized;
-
 		return new Plane(nn.x, nn.y, nn.z, -(p.x * nn.x + p.y * nn.y + p.z * nn.z));
 	}
 

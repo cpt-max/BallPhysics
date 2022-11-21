@@ -1,9 +1,8 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 
-
+/*
 public class uiEditor : EditorWindow
 {
     [MenuItem("Window/UI Toolkit/uiEditor")]
@@ -27,4 +26,4 @@ public class uiEditor : EditorWindow
         VisualElement labelFromUXML = visualTree.Instantiate();
         root.Add(labelFromUXML);
     }
-}
+}*/

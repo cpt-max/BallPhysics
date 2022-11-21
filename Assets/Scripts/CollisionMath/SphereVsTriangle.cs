@@ -6,7 +6,7 @@ using UnityEngine;
 
 public static class SphereVsTriangle
 {
-	public static bool TestCollision(Sphere sphere, Vector3 sphereVel, Triangle tri, out float distTravel, out Vector3 collNormal)
+	public static bool TestCollision(Vector3 sphereCenter, float sphereRadius, Vector3 sphereVel, Triangle tri, out float distTravel, out Vector3 collNormal)
 	{
 		distTravel = float.MaxValue;
 		collNormal = Vector3.zero;
@@ -22,16 +22,16 @@ public static class SphereVsTriangle
 		Plane plane = Plane.FromPointAndNormal(tri.p1, tri.normal);
 
 		// pass1: sphere VS plane
-		float h = plane.Dist(sphere.center);
-		if (h < -sphere.radius)
+		float h = plane.Dist(sphereCenter);
+		if (h < -sphereRadius)
 			return false;
 
-		if (h > sphere.radius) {
-			h -= sphere.radius;
+		if (h > sphereRadius) {
+			h -= sphereRadius;
 			float dot = Vector3.Dot(tri.normal, nvelo);
 			if (dot != 0) {
 				float t = -h / dot;
-				Vector3 onPlane = sphere.center + nvelo * t;
+				Vector3 onPlane = sphereCenter + nvelo * t;
 				if (IsPointInsideTriangle(tri.p1, tri.p2, tri.p3, onPlane)) {
 					if (t < distTravel) {
 						distTravel = t;
@@ -49,7 +49,7 @@ public static class SphereVsTriangle
 			Vector3 seg_pt1 = seg_pt0 - nvelo;
 			Vector3 v = seg_pt1 - seg_pt0;
 
-			bool res = TestIntersectionSphereLine(sphere, seg_pt0, seg_pt1, out int nbInter, out float inter1, out float inter2);
+			bool res = TestIntersectionSphereLine(sphereCenter, sphereRadius, seg_pt0, seg_pt1, out int nbInter, out float inter1, out float inter2);
 			if (res == false)
 				continue;
 
@@ -64,7 +64,7 @@ public static class SphereVsTriangle
 			{
 				distTravel = t;
 				Vector3 onSphere = seg_pt0 + v * t;
-				collNormal = sphere.center - onSphere;
+				collNormal = sphereCenter - onSphere;
 				col = 1;
 			}
 		}
@@ -79,14 +79,14 @@ public static class SphereVsTriangle
 			Vector3 edge1 = tri.Point(j);
 
 			plane = Plane.FromPoints(edge0, edge1, edge1 - nvelo);
-			float d = plane.Dist(sphere.center);
-			if (d > sphere.radius || d < -sphere.radius)
+			float d = plane.Dist(sphereCenter);
+			if (d > sphereRadius || d < -sphereRadius)
 				continue;
 
-			float srr = sphere.radius * sphere.radius;
+			float srr = sphereRadius * sphereRadius;
 			float r = Mathf.Sqrt(srr - d * d);
 
-			Vector3 pt0 = plane.Project(sphere.center); // center of the sphere slice (a circle)
+			Vector3 pt0 = plane.Project(sphereCenter); // center of the sphere slice (a circle)
 
 			h = DistancePointToLine(pt0, edge0, edge1, out Vector3 onLine);
 			Vector3 v = (onLine - pt0).normalized;
@@ -131,7 +131,7 @@ public static class SphereVsTriangle
 				continue;
 
 			distTravel = t;
-			collNormal = sphere.center - pt1;
+			collNormal = sphereCenter - pt1;
 			col = 2;
 		}
 
@@ -189,7 +189,7 @@ public static class SphereVsTriangle
 		return val * val;
 	}
 
-	static bool TestIntersectionSphereLine(Sphere sphere, Vector3 pt0, Vector3 pt1, out int nbInter, out float inter1, out float inter2)
+	static bool TestIntersectionSphereLine(Vector3 sphereCenter, float sphereRadius, Vector3 pt0, Vector3 pt1, out int nbInter, out float inter1, out float inter2)
 	{
 		inter1 = float.MaxValue;
 		inter2 = float.MaxValue;
@@ -198,13 +198,13 @@ public static class SphereVsTriangle
 		float a, b, c, i;
 
 		a = Square(pt1.x - pt0.x) + Square(pt1.y - pt0.y) + Square(pt1.z - pt0.z);
-		b = 2 * ((pt1.x - pt0.x) * (pt0.x - sphere.center.x)
-			+ (pt1.y - pt0.y) * (pt0.y - sphere.center.y)
-			+ (pt1.z - pt0.z) * (pt0.z - sphere.center.z));
-		c = Square(sphere.center.x) + Square(sphere.center.y) +
-			Square(sphere.center.z) + Square(pt0.x) +
+		b = 2 * ((pt1.x - pt0.x) * (pt0.x - sphereCenter.x)
+			+ (pt1.y - pt0.y) * (pt0.y - sphereCenter.y)
+			+ (pt1.z - pt0.z) * (pt0.z - sphereCenter.z));
+		c = Square(sphereCenter.x) + Square(sphereCenter.y) +
+			Square(sphereCenter.z) + Square(pt0.x) +
 			Square(pt0.y) + Square(pt0.z) -
-			2 * (sphere.center.x * pt0.x + sphere.center.y * pt0.y + sphere.center.z * pt0.z) - Square(sphere.radius);
+			2 * (sphereCenter.x * pt0.x + sphereCenter.y * pt0.y + sphereCenter.z * pt0.z) - Square(sphereRadius);
 		i = b * b - 4 * a * c;
 
 		if (i < 0)
