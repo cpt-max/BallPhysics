@@ -12,6 +12,8 @@ public struct BallState
     public float radius;
     public float mass;
     public float inertia;
+    public float elasticity;
+    public float surfaceFriction;
 }
 
 public class PhysicsManager : MonoBehaviour
@@ -32,9 +34,9 @@ public class PhysicsManager : MonoBehaviour
     List<StaticMeshCollider> colliders = new List<StaticMeshCollider>();
 
     BallState[] ballStates = new BallState[256];
-    int[] ballInds = new int[256];
-    int[] ballInds2ndPhase = new int[256];
-    int ballCount2ndPhase;
+    int[] ballInds1 = new int[256]; // 1st update phase
+    int[] ballInds2 = new int[256]; // 2nd update phase
+    int ballCount2ndPhase; 
 
     [HideInInspector]
     public GameObject ballsParent;
@@ -69,13 +71,14 @@ public class PhysicsManager : MonoBehaviour
         ballCount = balls.Count;
         sleepingBallCount = 0;
 
-        // copy ball parameters to readonly bodyStates array
-        // this will make sure that reults are independent of the body update order
+        // copy ball parameters to readonly ballStates array.
+        // this array represents the beginning ball states, before updates are applied.
+        // this will make sure that reults are independent of the ball update order.
         if (ballStates.Length < balls.Count)
         {
             ballStates = new BallState[balls.Count * 2];
-            ballInds = new int[balls.Count * 2];
-            ballInds2ndPhase = new int[balls.Count * 2];
+            ballInds1 = new int[balls.Count * 2];
+            ballInds2 = new int[balls.Count * 2];
         }
 
         for (int i = 0; i < balls.Count; i++)
@@ -86,24 +89,27 @@ public class PhysicsManager : MonoBehaviour
             ballStates[i].radius = balls[i].radius;
             ballStates[i].mass = balls[i].mass;
             ballStates[i].inertia = balls[i].inertia;
+            ballStates[i].elasticity = balls[i].elasticity;
+            ballStates[i].surfaceFriction = balls[i].surfaceFriction;
             ballStates[i].speed = balls[i].velocity.magnitude;
 
-            ballInds[i] = i;
+            ballInds1[i] = i;
             if (balls[i].isSleeping) 
                 sleepingBallCount++;
         }
 
-        // update balls in 2 steps
+        // update balls in 2 phases
         ballCount2ndPhase = 0;
 
-        UpdateBalls(ballInds, balls.Count);
-        UpdateBalls(ballInds2ndPhase, ballCount2ndPhase);
+        UpdateBalls(ballInds1, balls.Count);
+        UpdateBalls(ballInds2, ballCount2ndPhase);
 
         // remove bodies when out of bounds or too many
         for (int i = 0; i < balls.Count; i++)
         {
             if (balls.Count > maxBallCount ||
-                balls[i].position.sqrMagnitude > 10000)
+                balls[i].position.y < -100 ||
+                balls[i].position.sqrMagnitude > 100000)
             {
                 Destroy(balls[i].gameObject);
                 balls.RemoveAt(i);
@@ -185,6 +191,9 @@ public class PhysicsManager : MonoBehaviour
             // collision response
             if (collider >= 0)
             {
+                // move normally till time of collision
+                ball.position += stateMe.vel * timeTillColl;
+
                 // collision happend 
                 if (colliderIsBall)
                 {
@@ -197,15 +206,15 @@ public class PhysicsManager : MonoBehaviour
                         balls[collider].sleepTimer = 0;
 
                         // make sure the awoken ball gets to update in the 2nd phase
-                        if (i > collider && ballInds != ballInds2ndPhase)
+                        if (i > collider && ballInds != ballInds2)
                         {
-                            ballInds2ndPhase[ballCount2ndPhase] = collider;
+                            ballInds2[ballCount2ndPhase] = collider;
                             ballCount2ndPhase++;
                         }
                     }
                 }
                 else
-                    ball.BounceOffStaticSurface(contactPoint, contactNormal, timeTillColl);
+                    ball.BounceOffStaticSurface(colliders[collider], contactPoint, contactNormal, timeTillColl);
             }
             else
             {
@@ -236,7 +245,7 @@ public class PhysicsManager : MonoBehaviour
             if (text != null)
             {
                 text.text = string.Format(
-@"Press Space to Change Balls Parameters
+@"Press Space to Change Ball Parameters
 Press Tab to Clear Balls
 
 Ball Count: {0}

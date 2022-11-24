@@ -6,6 +6,9 @@ public class StaticMeshCollider : MonoBehaviour
     Triangle[] triangles;
     public Bounds bounds;
 
+    [Range(0, 1)] public float elasticity = 0.5f; // 0..1
+    [Range(0, 1)] public float surfaceFriction = 1;
+
     void Start()
     {
         PhysicsManager.instance.RegisterStaticMeshCollider(this);

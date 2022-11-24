@@ -9,17 +9,18 @@ public class BallLauncher : MonoBehaviour
     public Vector3 offsetPosition;
     public Vector3 offsetRotation;
 
-    [Range(1, 20)]     public float fireRate = 10;
+    [Range(1, 20)]     public float fireRate = 5;
     [Range(0.03f, 1)]  public float radius = 0.3f;
     [Range(1, 100)]    public float density = 20;
     [Range(3, 150)]    public float speed = 20;
     [Range(-100, 100)] public float topSpin;
     [Range(-100, 100)] public float sideSpin;
-    [Range(0, 1)]      public float elasticity = 0.5f; // 0..1
-    [Range(0, 5)]      public float airDrag = 0.47f; // drag coeff for sphere
+    [Range(0, 1)]      public float elasticity = 0.7f; // 0..1
+    [Range(0, 1)]      public float surfaceFriction = 1f;
+    [Range(0, 3)]      public float airDrag = 0.47f; // drag coeff for sphere
     [Range(0, 2)]      public float rotAirDrag = 1f;
     [Range(0, 1)]      public float magnusLift = 0.4f;
-    [Range(0, 1)]      public float surfaceFriction = 0.5f;
+    
 
     float autoFireTimer;
 
