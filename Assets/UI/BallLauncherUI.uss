@@ -16,8 +16,8 @@
     color: rgb(255, 255, 255);
     padding-left: 30px;
     padding-right: 30px;
-    padding-top: 30px;
-    padding-bottom: 30px;
+    padding-top: 50px;
+    padding-bottom: 90px;
 }
 
 .slider {
@@ -25,4 +25,3 @@
     align-items: center;
     width: 270px;
 }
-

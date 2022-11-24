@@ -98,3 +98,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   velocity: {x: 0, y: 0, z: 0}
   angularVelocity: {x: 0, y: 0, z: 0}
+  radius: 0.3
+  mass: 2.261947
+  elasticity: 0.7
+  surfaceFriction: 1
+  airDrag: 0.47
+  airDragRotational: 1
+  magnusLift: 0.4
+  isSleeping: 0
+  sleepTimer: 0

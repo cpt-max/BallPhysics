@@ -8,32 +8,18 @@ public class BallLauncherUI : MonoBehaviour
     VisualElement root;
 
     void OnEnable()
-    {
-        var launcher = GetComponent<BallLauncher>();
+    { 
         var uiDocument = GetComponent<UIDocument>();
 
         root = uiDocument.rootVisualElement;
+        root.Q<Button>("reset").clicked += ResetClicked;
 
-        InitSlider("fireRate", launcher.fireRate);
-        InitSlider("speed", launcher.speed);
-        InitSlider("radius", launcher.radius);
-        InitSlider("density", launcher.density);
-        InitSlider("topSpin", launcher.topSpin);
-        InitSlider("sideSpin", launcher.sideSpin);
-        InitSlider("magnusLift", launcher.magnusLift);
-        InitSlider("elasticity", launcher.elasticity);
-        InitSlider("airDrag", launcher.airDrag);
-        InitSlider("rotAirDrag", launcher.rotAirDrag);
-        InitSlider("surfaceFriction", launcher.surfaceFriction);
-
+        InitSliders();
     }
 
     void Update()
     {
         var launcher = GetComponent<BallLauncher>();
-        var uiDocument = GetComponent<UIDocument>();
-
-        root = uiDocument.rootVisualElement;
 
         launcher.fireRate           = root.Q<Slider>("fireRate").value;
         launcher.speed              = root.Q<Slider>("speed").value;
@@ -46,6 +32,23 @@ public class BallLauncherUI : MonoBehaviour
         launcher.airDrag            = root.Q<Slider>("airDrag").value;
         launcher.rotAirDrag         = root.Q<Slider>("rotAirDrag").value;
         launcher.surfaceFriction    = root.Q<Slider>("surfaceFriction").value;
+    }
+
+    void InitSliders()
+    {
+        var launcher = GetComponent<BallLauncher>();
+
+        InitSlider("fireRate", launcher.fireRate);
+        InitSlider("speed", launcher.speed);
+        InitSlider("radius", launcher.radius);
+        InitSlider("density", launcher.density);
+        InitSlider("topSpin", launcher.topSpin);
+        InitSlider("sideSpin", launcher.sideSpin);
+        InitSlider("magnusLift", launcher.magnusLift);
+        InitSlider("elasticity", launcher.elasticity);
+        InitSlider("airDrag", launcher.airDrag);
+        InitSlider("rotAirDrag", launcher.rotAirDrag);
+        InitSlider("surfaceFriction", launcher.surfaceFriction);
     }
 
     void InitSlider(string name, float value)
@@ -63,5 +66,26 @@ public class BallLauncherUI : MonoBehaviour
         {
             Debug.Log("BallLauncherUI.InitSlider: no Range attribute for slider " + name);
         }
+    }
+
+    void ResetClicked()
+    {
+        var launcher = GetComponent<BallLauncher>();
+        var bl = gameObject.AddComponent<BallLauncher>();
+
+        launcher.fireRate = bl.fireRate;
+        launcher.speed = bl.speed;
+        launcher.radius = bl.radius;
+        launcher.density = bl.density;
+        launcher.topSpin = bl.topSpin;
+        launcher.sideSpin = bl.sideSpin;
+        launcher.magnusLift = bl.magnusLift;
+        launcher.elasticity = bl.elasticity;
+        launcher.airDrag = bl.airDrag;
+        launcher.rotAirDrag = bl.rotAirDrag;
+        launcher.surfaceFriction = bl.surfaceFriction;
+
+        InitSliders();
+        Destroy(bl);
     }
 }
