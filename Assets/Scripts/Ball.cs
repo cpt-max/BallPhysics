@@ -9,10 +9,18 @@ public class Ball : MonoBehaviour
     public float radius = 0.5f;
     public float mass = 1;
     public float elasticity = 0.5f; // 0..1
-    public float airDragTranslational = 0.47f; // drag coeff for sphere
+    public float airDrag = 0.47f; // drag coeff for sphere
     public float airDragRotational = 1f;
     public float magnusLift = 0.4f;
-    public float surfaceFriction = 2f;
+    public float surfaceFriction = 0.5f;
+
+    Vector3 sleepPos;
+    Quaternion sleepRot;
+    public bool isSleeping;
+    public float sleepTimer;
+    const float sleepRadius = 0.1f;
+    const float sleepAng = 5f;
+    const float fallAsleepDuration = 1;
 
     public Vector3 position
     {
@@ -26,7 +34,7 @@ public class Ball : MonoBehaviour
     }
 
     public float volume => radius * radius * radius * Mathf.PI * (4f / 3f);
-    public float momentOfInertia => mass * radius * radius * (2f / 3f); // hollow sphere
+    public float inertia => mass * radius * radius * (2f / 3f); // moment of inertia for hollow sphere
 
     void Start()
     {
@@ -50,22 +58,22 @@ public class Ball : MonoBehaviour
         //============================================================================
         // translational air drag 
         //============================================================================
-        float dragAccel = 0.5f * airDragTranslational * physics.airDensity * speedSqr * crossSectionalArea / mass;
+        float linDragCoeff = physics.linDragCoefficient.length == 0 ? 1 : physics.linDragCoefficient.Evaluate(speed);
+        float dragAccel = 0.5f * airDrag * linDragCoeff * physics.airDensity * speedSqr * crossSectionalArea / mass;
         velocity -= velocity.normalized * dragAccel * dt;
 
+        Debug.Log("speed: " + speed + " coeff: " + linDragCoeff);
         //============================================================================
         // rotational air drag 
         // this is a crude approximation using a constant rotational air drag coefficient, which would vary a lot in the real world
         //============================================================================
-        float rotDragMoment = airDragRotational * angularSpeedSqr * radius * radius * radius * radius * radius;
-
-        rotDragMoment *= Mathf.Lerp(3,  1, angularSpeed / 30); // add extra drag for low speeds
-        rotDragMoment *= Mathf.Lerp(5,  1, angularSpeed / 10); // add extra drag for very low speeds
-        rotDragMoment *= Mathf.Lerp(10, 1, angularSpeed /  3); // add extra drag for very very low speeds
-
-        float rotDragAccel = rotDragMoment / momentOfInertia;
+        float rotDragCoeff = physics.rotDragCoefficient.length == 0 ? 1 : physics.rotDragCoefficient.Evaluate(angularSpeed);
+        float rotDragMoment = airDragRotational * rotDragCoeff * angularSpeedSqr * radius * radius * radius * radius * radius;
+        float rotDragAccel = rotDragMoment / inertia;
         angularVelocity -= angularVelocity.normalized * rotDragAccel * dt;
-        
+
+        //Debug.Log("ang speed: " + angularSpeed + " ang coeff: " + rotDragCoeff);
+
         //============================================================================
         // magnus effect (lift force from spinning)
         // https://www.engineersedge.com/calculators/magnus_effect_calculator_15766.htm
@@ -80,50 +88,84 @@ public class Ball : MonoBehaviour
         // gravity
         //============================================================================
         velocity.y -= physics.gravity * dt;
+
+        //============================================================================
+        // sleep
+        //============================================================================
+        if ((position - sleepPos).sqrMagnitude > sleepRadius * sleepRadius ||
+            Quaternion.Angle(rotation, sleepRot)  > sleepAng)
+        {
+            isSleeping = false;
+            sleepTimer = 0;
+            sleepPos = position;
+            sleepRot = rotation;
+        }
+        else
+        {
+            sleepTimer += dt;
+            if (sleepTimer > fallAsleepDuration)
+                isSleeping = true;
+        }
     }
 
     public void BounceOffStaticSurface(Vector3 contactPoint, Vector3 contactNormal, float timeTillColl)
     {
-        Vector3 posAtColl = position + velocity * timeTillColl;
-        Vector3 deltaAngVel = AngVelDeltaFromSurfaceFriction(contactPoint, contactNormal, posAtColl, Vector3.zero, Vector3.zero, Vector3.zero);
+        // move normally till time of collision
+        position += velocity * timeTillColl;
 
-        position = posAtColl;
-        velocity = Vector3.Reflect(velocity, contactNormal) * (0.5f + 0.5f * elasticity);
-        angularVelocity += deltaAngVel;
+        // linear impuls transfer
+        float linImpactSpeed = Vector3.Dot(velocity, contactNormal);
+        float effectiveMass = (1 + elasticity) / (1 / mass);
+        Vector3 impulse = linImpactSpeed * effectiveMass * contactNormal;
+        velocity -= impulse / mass;
+
+        // angular momentum transfer
+        Vector3 contactVecMe = contactPoint - position;
+        Vector3 contactVelFromRotMe = Vector3.Cross(angularVelocity, contactVecMe);
+        Vector3 deltaContactVel = velocity + contactVelFromRotMe;
+        Vector3 rotImpulseNormal = -deltaContactVel.normalized;
+        Vector3 contactCrossMe = Vector3.Cross(contactVecMe, rotImpulseNormal);
+        float rotImpactSpeed = Vector3.Dot(velocity, rotImpulseNormal) + Vector3.Dot(angularVelocity, contactCrossMe);
+        float effectiveRotMass = (1 + elasticity) / (1 / mass + Vector3.Dot(contactCrossMe, contactCrossMe) / inertia);
+        Vector3 rotImpulse = rotImpactSpeed * effectiveRotMass * surfaceFriction * rotImpulseNormal;
+        angularVelocity += Vector3.Cross(rotImpulse, contactVecMe) / inertia;
     }
 
     public void BounceOffOtherBall(in BallState otherBall, Vector3 contactPoint, Vector3 contactNormal, float timeTillColl)
     {
-        Vector3 posAtColl = position + velocity * timeTillColl;
-        Vector3 posAtCollHim = otherBall.pos + otherBall.vel * timeTillColl;
-        Vector3 deltaAngVel = AngVelDeltaFromSurfaceFriction(contactPoint, contactNormal, posAtColl, posAtCollHim, otherBall.vel, otherBall.angVel);
+        // move normally till time of collision
+        position += velocity * timeTillColl;
 
-        float impactSpeed = Vector3.Dot(velocity - otherBall.vel, contactNormal);
-        float effectiveMass = 1 / (1 / mass + 1 / otherBall.mass);
-        float impulse = effectiveMass * impactSpeed * (1 + elasticity);
+        // linear impuls transfer
+        Vector3 deltaVel = velocity - otherBall.vel;
+        float linImpactSpeed = Vector3.Dot(deltaVel, contactNormal);
+        float effectiveMass = (1 + elasticity) / (1 / mass + 1 / otherBall.mass);
+        Vector3 impulse = linImpactSpeed * effectiveMass * contactNormal;
+        velocity -= impulse / mass;
 
-        position = posAtColl;
-        velocity -= contactNormal * impulse / mass;
-        angularVelocity += deltaAngVel;
-    }
+        // angular momentum transfer
+        Vector3 posHe = otherBall.pos + otherBall.vel * timeTillColl;
 
-    private Vector3 AngVelDeltaFromSurfaceFriction(Vector3 contactPoint, Vector3 contactNormal, Vector3 posAtCollMe, Vector3 posAtCollHim, Vector3 velocityHim, Vector3 angularVelocityHim)
-    {
-        // quickly made up => needs improvement
-        // also angular momentum needs to be converted to linear momentum on impact
-        Vector3 contactVecMe = contactPoint - posAtCollMe;
-        Vector3 contactVecHim = contactPoint - posAtCollHim;
+        Vector3 contactVecMe = contactPoint - position;
+        Vector3 contactVecHe = contactPoint - posHe;
 
-        Vector3 contactPointVelMe  = velocity    + Vector3.Cross(angularVelocity,  contactVecMe);
-        Vector3 contactPointVelHim = velocityHim + Vector3.Cross(angularVelocityHim, contactVecHim);
-        Vector3 contactPointVelDelta = contactPointVelMe - contactPointVelHim;
+        Vector3 contactVelFromRotMe = Vector3.Cross(angularVelocity, contactVecMe);
+        Vector3 contactVelFromRotHe = Vector3.Cross(otherBall.angVel, contactVecHe);
+       
+        Vector3 deltaContactVel = deltaVel + (contactVelFromRotMe - contactVelFromRotHe);
+        Vector3 rotImpulseNormal = -deltaContactVel.normalized;
 
-        float tangentialSpeed = contactPointVelDelta.magnitude;
-        float impactSpeed = Mathf.Max(0, Vector3.Dot(velocity, -contactNormal));
-        float friction = tangentialSpeed * impactSpeed * mass;
-        Vector3 torque = Vector3.Cross(contactVecMe, friction * -contactPointVelDelta.normalized);
-        float contactTime = 0.01f;
-        Vector3 deltaAngVel = surfaceFriction * contactTime * torque / momentOfInertia;
-        return deltaAngVel;
+        Vector3 contactCrossMe = Vector3.Cross(contactVecMe, rotImpulseNormal);
+        Vector3 contactCrossHe = Vector3.Cross(contactVecHe, rotImpulseNormal);
+
+        float rotImpactSpeed = Vector3.Dot(deltaVel, rotImpulseNormal) + (Vector3.Dot(angularVelocity, contactCrossMe) - Vector3.Dot(otherBall.angVel, contactCrossHe));
+        
+        float effectiveRotMass = (1 + elasticity) / (
+            1 / mass + 1 / otherBall.mass + 
+            Vector3.Dot(contactCrossMe, contactCrossMe) / inertia +     // Vector3.Dot(contactCrossMe, (InertiaTensor.Inverted * contactCrossMe))
+            Vector3.Dot(contactCrossHe, contactCrossHe) / otherBall.inertia);
+        Vector3 rotImpulse = rotImpactSpeed * effectiveRotMass * surfaceFriction * rotImpulseNormal;
+
+        angularVelocity += Vector3.Cross(rotImpulse, contactVecMe) / inertia;
     }
 }

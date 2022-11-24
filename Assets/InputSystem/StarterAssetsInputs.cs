@@ -28,10 +28,10 @@ namespace StarterAssets
 
 		public void OnLook(InputValue value)
 		{
-			if(cursorInputForLook)
-			{
+			if (cursorInputForLook && Cursor.lockState == CursorLockMode.Locked)
 				LookInput(value.Get<Vector2>());
-			}
+			else
+				LookInput(Vector2.zero);
 		}
 
 		public void OnJump(InputValue value)

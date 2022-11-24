@@ -93,7 +93,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6b911390c5825014e8377183a7837d3f, type: 2}
+  - {fileID: 2100000, guid: 29e6fc39704bd464893865d48ec86a37, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -140,7 +140,6 @@ GameObject:
   - component: {fileID: 8997996947095583982}
   - component: {fileID: 8616685848737228382}
   - component: {fileID: 8616685848737228371}
-  - component: {fileID: 1978471637655604388}
   - component: {fileID: 5420857361349278248}
   - component: {fileID: 8616685848737228376}
   m_Layer: 8
@@ -214,23 +213,6 @@ MonoBehaviour:
   CinemachineCameraTarget: {fileID: 0}
   TopClamp: 90
   BottomClamp: -90
---- !u!114 &1978471637655604388
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8616685848737228372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70c9022d0a111164ea91ca6b2dbb82c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pushLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  canPush: 0
-  strength: 1.1
 --- !u!114 &5420857361349278248
 MonoBehaviour:
   m_ObjectHideFlags: 0

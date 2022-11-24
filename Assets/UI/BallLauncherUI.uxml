@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/BallLauncherUI.uss?fileID=7433441132597879392&amp;guid=148c7d057803cc7449b921788a75976e&amp;type=3#BallLauncherUI" />
+    <ui:VisualElement style="transform-origin: center; translate: 0 0; align-items: center; margin-top: auto; margin-bottom: auto;">
+        <ui:VisualElement name="background" style="width: 500px;">
+            <ui:Slider label="Speed" value="42" high-value="100" name="speed" low-value="5" show-input-field="true" focusable="false" class="slider" />
+            <ui:Slider label="Fire Rate" value="42" high-value="100" name="fireRate" low-value="1" focusable="false" show-input-field="true" class="slider" />
+            <ui:Slider label="Radius" value="42" high-value="1" name="radius" low-value="0.02" show-input-field="true" focusable="false" class="slider" />
+            <ui:Slider label="Density" value="42" high-value="100" name="density" low-value="1" show-input-field="true" focusable="false" class="slider" />
+            <ui:Slider label="Top Spin" value="0" high-value="100" name="topSpin" low-value="-100" show-input-field="true" focusable="false" class="slider" />
+            <ui:Slider label="Side Spin" value="0" high-value="100" name="sideSpin" low-value="-100" show-input-field="true" focusable="false" class="slider" />
+            <ui:Slider label="Magnus Lift" value="42" high-value="1" name="magnusLift" low-value="0" show-input-field="true" focusable="false" class="slider" />
+            <ui:Slider label="Elasticity" value="42" high-value="1" name="elasticity" low-value="0" show-input-field="true" focusable="false" class="slider" />
+            <ui:Slider label="Air Drag Trans." value="42" high-value="5" name="airDrag" low-value="0" show-input-field="true" focusable="false" class="slider" />
+            <ui:Slider label="Air Drag Rot." value="42" high-value="100" name="rotAirDrag" low-value="0" show-input-field="true" focusable="false" class="slider" />
+            <ui:Slider label="Surface Friction" value="42" high-value="5" name="surfaceFriction" low-value="0" show-input-field="true" focusable="false" class="slider" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -5,6 +5,8 @@ public static class SphereVsSphere
 {
     public static bool TestCollision(Vector3 pos1, Vector3 vel1, float rad1, Vector3 pos2, Vector3 vel2, float rad2, out float timeTillColl, out Vector3 contactPoint, out Vector3 contactNormal)
     {
+        // Dervivation: for spheres to be in contact, the distance btw them has to be equal to the sum of theri radius:
+        // |(pos1 + vel1 * t) - (pos2 + vel2 * t)| = rad1 + rad2
         timeTillColl = 0;
         contactNormal = Vector3.zero;
         contactPoint = Vector3.zero;
@@ -14,7 +16,7 @@ public static class SphereVsSphere
 
         float a = Vector3.Dot(deltaVel, deltaVel);
         float b = 2 * Vector3.Dot(deltaPos, deltaVel);
-        float c = Vector3.Dot(deltaPos, deltaPos) - (rad1 + rad2);  
+        float c = Vector3.Dot(deltaPos, deltaPos) - (rad1 + rad2) * (rad1 + rad2);  
 
         if (QuadraticEquation(a, b, c, out float t1, out float t2))
         {
