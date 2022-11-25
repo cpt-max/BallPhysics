@@ -15,7 +15,7 @@ public class BallLauncher : MonoBehaviour
     [Range(3, 150)]    public float speed = 20;
     [Range(-100, 100)] public float topSpin;
     [Range(-100, 100)] public float sideSpin;
-    [Range(0, 1)]      public float elasticity = 0.7f; // 0..1
+    [Range(0.1f, 1)]   public float elasticity = 0.7f; // 0..1
     [Range(0, 1)]      public float surfaceFriction = 1f;
     [Range(0, 3)]      public float airDrag = 0.47f; // drag coeff for sphere
     [Range(0, 2)]      public float rotAirDrag = 1f;

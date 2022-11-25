@@ -8,12 +8,13 @@ public struct BallState
     public Vector3 pos;
     public Vector3 vel;
     public Vector3 angVel;
-    public float speed;
     public float radius;
     public float mass;
     public float inertia;
     public float elasticity;
     public float surfaceFriction;
+
+    public float dtOffset; 
 }
 
 public class PhysicsManager : MonoBehaviour
@@ -91,7 +92,7 @@ public class PhysicsManager : MonoBehaviour
             ballStates[i].inertia = balls[i].inertia;
             ballStates[i].elasticity = balls[i].elasticity;
             ballStates[i].surfaceFriction = balls[i].surfaceFriction;
-            ballStates[i].speed = balls[i].velocity.magnitude;
+            ballStates[i].dtOffset = 0;
 
             ballInds1[i] = i;
             if (balls[i].isSleeping) 
@@ -99,6 +100,7 @@ public class PhysicsManager : MonoBehaviour
         }
 
         // update balls in 2 phases
+        // after a collision a ball changes direction, since it still has time left over this frame to move, the 2nd collision detection phase is needed  
         ballCount2ndPhase = 0;
 
         UpdateBalls(ballInds1, balls.Count);
@@ -123,6 +125,7 @@ public class PhysicsManager : MonoBehaviour
     private void UpdateBalls(int[] ballInds, int count)
     {
         float dt = Time.deltaTime;
+        bool isFirstPhase = ballInds == ballInds1;
 
         for (int i = 0; i < count; i++)
         {
@@ -145,10 +148,10 @@ public class PhysicsManager : MonoBehaviour
 
             for (int j = 0; j < colliders.Count; j++)
             {
-                if (colliders[j].SphereCollision(stateMe.pos, stateMe.radius, stateMe.vel, stateMe.speed * dt, out float collTime, out Vector3 point, out Vector3 normal))
+                if (colliders[j].SphereCollision(ball.position, ball.radius, ball.velocity, ball.velocity.magnitude * dt, out float collTime, out Vector3 point, out Vector3 normal))
                 {
-                    if (collTime <= dt &&
-                        collTime >= 0 &&
+                    if (collTime <= dt - stateMe.dtOffset &&
+                        collTime > 0 &&
                         collTime < timeTillColl)
                     {
                         timeTillColl = collTime;
@@ -171,10 +174,12 @@ public class PhysicsManager : MonoBehaviour
                     continue;
 
                 var stateHim = ballStates[j];
-                if (SphereVsSphere.TestCollision(stateMe.pos, stateMe.vel, stateMe.radius, stateHim.pos, stateHim.vel, stateHim.radius, out float collTime, out Vector3 point, out Vector3 normal))
+                stateHim.pos += stateHim.vel * stateMe.dtOffset; // in 2nd phase we have to move the other ball forward in time to match our own time offset
+
+                if (SphereVsSphere.TestCollision(ball.position, ball.velocity, ball.radius, stateHim.pos, stateHim.vel, stateHim.radius, out float collTime, out Vector3 point, out Vector3 normal))
                 {
-                    if (collTime <= dt &&
-                        collTime >= 0 &&
+                    if (collTime <= dt - stateMe.dtOffset &&
+                        collTime > 0 &&
                         collTime < timeTillColl)
                     {
                         timeTillColl = collTime;
@@ -192,12 +197,12 @@ public class PhysicsManager : MonoBehaviour
             if (collider >= 0)
             {
                 // move normally till time of collision
-                ball.position += stateMe.vel * timeTillColl;
+                ball.position += ball.velocity * timeTillColl;
 
                 // collision happend 
                 if (colliderIsBall)
                 {
-                    ball.BounceOffOtherBall(ballStates[collider], contactPoint, contactNormal, timeTillColl);
+                    ball.BounceOffOtherBall(ballStates[collider], contactPoint, contactNormal, timeTillColl + stateMe.dtOffset);
 
                     // wake up the other ball
                     if (balls[collider].isSleeping)
@@ -206,7 +211,7 @@ public class PhysicsManager : MonoBehaviour
                         balls[collider].sleepTimer = 0;
 
                         // make sure the awoken ball gets to update in the 2nd phase
-                        if (i > collider && ballInds != ballInds2)
+                        if (i > collider && isFirstPhase)
                         {
                             ballInds2[ballCount2ndPhase] = collider;
                             ballCount2ndPhase++;
@@ -214,12 +219,20 @@ public class PhysicsManager : MonoBehaviour
                     }
                 }
                 else
-                    ball.BounceOffStaticSurface(colliders[collider], contactPoint, contactNormal, timeTillColl);
+                    ball.BounceOffStaticSurface(colliders[collider], contactPoint, contactNormal);
+
+                if (isFirstPhase)
+                {
+                    // add ball to 2nd update phase, as it has still time left over to move
+                    stateMe.dtOffset = timeTillColl;
+                    ballInds2[ballCount2ndPhase] = ind;
+                    ballCount2ndPhase++;
+                }
             }
             else
             {
                 // no collision => move body normally
-                ball.UpdateMotion(this, dt);
+                ball.UpdateMotion(this, dt - stateMe.dtOffset);
             }
         }
     }

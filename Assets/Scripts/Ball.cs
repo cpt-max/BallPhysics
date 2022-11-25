@@ -8,12 +8,12 @@ public class Ball : MonoBehaviour
 
     public float radius = 0.5f;
     public float mass = 1;
-    [Range(0, 1)] public float elasticity = 0.7f; // 0..1
+    [Range(0.1f, 1)] public float elasticity = 0.7f; // 0..1
     [Range(0, 1)] public float surfaceFriction = 1f;
     public float airDrag = 0.47f; // drag coeff for sphere
     public float airDragRotational = 1f;
     public float magnusLift = 0.4f;
-    
+
     Vector3 sleepPos;
     Quaternion sleepRot;
     public bool isSleeping;
@@ -108,11 +108,15 @@ public class Ball : MonoBehaviour
         {
             sleepTimer += dt;
             if (sleepTimer > fallAsleepDuration)
+            {
                 isSleeping = true;
+                velocity = Vector3.zero;
+                angularVelocity = Vector3.zero;
+            }
         }
     }
 
-    public void BounceOffStaticSurface(StaticMeshCollider collider, Vector3 contactPoint, Vector3 contactNormal, float timeTillColl)
+    public void BounceOffStaticSurface(StaticMeshCollider collider, Vector3 contactPoint, Vector3 contactNormal)
     {
         float combinedElasticity = Mathf.Max(elasticity, collider.elasticity);
         float combinedFriction = Mathf.Min(surfaceFriction, collider.surfaceFriction) * 0.5f;
@@ -136,10 +140,12 @@ public class Ball : MonoBehaviour
         angularVelocity += Vector3.Cross(rotImpulse, contactVecMe) / inertia;
     }
 
-    public void BounceOffOtherBall(in BallState otherBall, Vector3 contactPoint, Vector3 contactNormal, float timeTillColl)
+    public void BounceOffOtherBall(in BallState otherBall, Vector3 contactPoint, Vector3 contactNormal, float timeTillCollOtherBall)
     {
         float combinedElasticity = Mathf.Max(elasticity, otherBall.elasticity);
         float combinedFriction = Mathf.Min(surfaceFriction, otherBall.surfaceFriction) * 0.5f;
+
+        Vector3 posHe = otherBall.pos + otherBall.vel * timeTillCollOtherBall;
 
         // linear impuls transfer
         Vector3 deltaVel = velocity - otherBall.vel;
@@ -149,8 +155,6 @@ public class Ball : MonoBehaviour
         velocity -= impulse / mass;
 
         // angular momentum transfer
-        Vector3 posHe = otherBall.pos + otherBall.vel * timeTillColl;
-
         Vector3 contactVecMe = contactPoint - position;
         Vector3 contactVecHe = contactPoint - posHe;
 

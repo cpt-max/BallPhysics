@@ -249,7 +249,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &82915729
 MeshRenderer:
@@ -350,7 +350,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &129014248
 MeshRenderer:
@@ -501,7 +501,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!1 &302142041
 GameObject:
@@ -552,7 +552,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &302142044
 MeshRenderer:
@@ -921,7 +921,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &434300004
 MeshRenderer:
@@ -1022,7 +1022,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &487341018
 MeshRenderer:
@@ -1123,7 +1123,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &529687574
 MeshRenderer:
@@ -1224,7 +1224,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &535981273
 MeshRenderer:
@@ -1358,7 +1358,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &585177692
 MeshRenderer:
@@ -1459,7 +1459,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &628300733
 MeshRenderer:
@@ -1560,7 +1560,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &636725834
 MeshRenderer:
@@ -1796,7 +1796,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!1 &701857787
 GameObject:
@@ -1847,7 +1847,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &701857790
 MeshRenderer:
@@ -1948,7 +1948,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &789510014
 MeshRenderer:
@@ -2098,7 +2098,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &841369450
 MeshRenderer:
@@ -2359,7 +2359,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!1 &956150162
 GameObject:
@@ -2410,7 +2410,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &956150165
 MeshRenderer:
@@ -2558,7 +2558,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1026468655
 MeshRenderer:
@@ -2660,7 +2660,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!64 &1031120845
 MeshCollider:
@@ -2810,7 +2810,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1050152542
 MeshRenderer:
@@ -2976,7 +2976,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!1 &1368515998
 GameObject:
@@ -3092,7 +3092,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!1 &1380388234
 GameObject:
@@ -3143,7 +3143,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1380388237
 MeshRenderer:
@@ -3318,7 +3318,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1432046407
 MeshRenderer:
@@ -3425,7 +3425,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1531790443
 MeshRenderer:
@@ -3526,7 +3526,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1582255956
 MeshRenderer:
@@ -3627,7 +3627,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1591692894
 MeshRenderer:
@@ -3966,7 +3966,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1801085859
 MeshRenderer:
@@ -4067,7 +4067,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1807504290
 MeshRenderer:
@@ -4260,7 +4260,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1861465858
 MeshRenderer:
@@ -4361,7 +4361,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1871929247
 MeshRenderer:
@@ -4462,7 +4462,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1908947085
 MeshRenderer:
@@ -4613,7 +4613,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!1 &1960598691
 GameObject:
@@ -4664,7 +4664,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &1960598694
 MeshRenderer:
@@ -4848,7 +4848,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &2069964391
 MeshRenderer:
@@ -5066,7 +5066,7 @@ MonoBehaviour:
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
-  elasticity: 0.5
+  elasticity: 0
   surfaceFriction: 1
 --- !u!23 &2082796134
 MeshRenderer:
